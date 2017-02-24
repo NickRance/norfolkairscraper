@@ -1,16 +1,24 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
+import sys, json
+
+try:
+    address = sys.argv[1]
+    print(address)
+except IndexError:
+    print("Needs to be called with address after the script\n e.g. python app.py '400 granby street'")
+    sys.exit()
 
 # driver = webdriver.PhantomJS('vendor/phantomjs/bin/phantomjs')
 driver = webdriver.Chrome('vendor/chromedriver')
 final_dict={}
 final_output = []
 
+driver.get("http://norfolkair.norfolk.gov/norfolkairmobile/")
+
 #driver.implicitly_wait(10)
 #driver.maximize_window()
-
-driver.get("http://norfolkair.norfolk.gov/norfolkairmobile/")
 
 def back():
     global driver
@@ -28,7 +36,8 @@ def search():
     global driver
     search_field = driver.find_element_by_id("ctl00_MainContent_txtadd")
     search_field.clear()
-    search_field.send_keys("400 granby street")
+    search_field.send_keys(address)
+    time.sleep(1)
     search_field.send_keys(Keys.RETURN)
 
 def openMenuOption(menu,index):
@@ -121,6 +130,8 @@ def main():
     print(final_output)
     print("Final Dict Contents:")
     print(final_dict)
+    with open(address+'.json', 'w') as outfile:
+        json.dump(final_dict, outfile, indent=4, sort_keys=True)
     driver.quit()
 
 main()
